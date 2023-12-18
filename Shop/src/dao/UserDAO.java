@@ -16,14 +16,6 @@ public class UserDAO {
     cartList = new ArrayList<>();
   }
 
-  public ArrayList<Cart> getCartList() {
-    return cartList;
-  }
-
-  public ArrayList<User> getUserList() {
-    return userList;
-  }
-
   public void addUserFromData(String userData) {
     String[] temp = userData.split("\n");
     for (String s : temp) {
@@ -81,22 +73,24 @@ public class UserDAO {
     return -1;
   }
 
-  public void quitUser(String log) {
+  public String quitUser(String log) {
     System.out.println(log+"님 회원탈퇴");
     int delIdx = isExistId(log);
     String pw = InputManger.getValue("pw >> ");
     if (!userList.get(delIdx).getPw().equals(pw)) {
       System.out.println("비밀번호가 일치 하지 않습니다");
-      return;
+      return log;
     }
-    deleteAllCartItem(log);
     System.out.println(userList.get(delIdx));
+    deleteAllUsersCartItem(log);
     userList.remove(delIdx);
     System.out.println("회원탈퇴 완료");
+    return null;
   }
 
   public void printUser() {
     for (User u : userList) {
+      if (u.getId().equals("admin")) continue;
       System.out.println(u);
     }
   }
@@ -117,28 +111,17 @@ public class UserDAO {
     return id;
   }
 
-  public void printMyCart(String log) {
-    System.out.println("회원 아이디 상품");
-    int total = 0;
-    for (Cart c : cartList) {
-      if (c.getUserId().equals(log)) {
-        System.out.println(c);
-      }
-    }
-
-  }
-
-  public void deleteMyCartItem(String log) {
-    printMyCart(log);
+  public void deleteMyCartItem(String log, ItemDAO idao) {
+    printMyCart(log, idao);
     String delName = InputManger.getValue("삭제할 상품 >> ");
     if (!hasItem(log, delName)) {
-      System.out.println("상품이이 없습니다.");
+      System.out.println("상품이 없습니다.");
       return;
     }
     for (int i = cartList.size() - 1; i >= 0; i--) {
       if (cartList.get(i).getUserId().equals(log) && cartList.get(i).getItemName().equals(delName)) {
         cartList.remove(i);
-        System.out.println("삭제완료");
+        System.out.println("주문취소 완료");
         return;
       }
     }
@@ -163,20 +146,6 @@ public class UserDAO {
 
   public void addItemtoMyCart(String log, String item) {
     cartList.add(new Cart(log, item));
-    printMyCart(log);
-  }
-
-  public void userManagement() {
-    printUser();
-    String id = InputManger.getValue("id >> ");
-    int delIdx = isExistId(id);
-    if (delIdx == -1) {
-      System.out.println("아이디가 존재하지 않습니다.");
-      return;
-    }
-    System.out.println(userList.get(delIdx));
-    userList.remove(delIdx);
-    System.out.println("회원탈퇴 완료");
   }
 
   public void printCart() {
@@ -223,14 +192,26 @@ public class UserDAO {
 
   public void deleteUser() {
     String id = InputManger.getValue("id >> ");
+    if (id.equals("admin")) {
+      System.out.println("관리자 삭제 불가");
+      return;
+    }
     int delIdx = isExistId(id);
     if (delIdx == -1) {
       System.out.println("아이디가 존재하지 않습니다.");
       return;
     }
-    deleteAllCartItem(id);
+    deleteAllUsersCartItem(id);
     userList.remove(delIdx);
     System.out.println("회원삭제 완료");
+  }
+
+  private void deleteAllUsersCartItem(String id) {
+    for (int i = cartList.size() - 1; i >= 0; i--) {
+      if (cartList.get(i).getUserId().equals(id)) {
+        cartList.remove(i);
+      }
+    }
   }
 
   public void printMyCart(String log, ItemDAO idao) {
@@ -238,15 +219,17 @@ public class UserDAO {
       System.out.println("장바구니 목록이 없습니다.");
       return;
     }
-    System.out.println("회원 아이디 상품");
+    System.out.println("아이디\t상품\t가격");
     int total = 0;
     for (Cart c : cartList) {
       if (c.getUserId().equals(log)) {
         System.out.print(c);
-        for (Item i : idao.getItemList()) {
-          if (c.getItemName().equals(i.getName())) {
-            System.out.print(" " + i.getPrice() + "원\n");
-            total += i.getPrice();
+        for (ArrayList<Item> i : idao.getItemList()) {
+          for (Item item : i) {
+            if (c.getItemName().equals(item.getName())) {
+              System.out.print("\t" + item.getPrice() + "원\n");
+              total += item.getPrice();
+            }
           }
         }
       }
@@ -262,5 +245,6 @@ public class UserDAO {
     }
     return false;
   }
+
 }
 

@@ -27,26 +27,4 @@ public class InputManger {
       }
     }//eow
   }//eom
-
-  public static int getValue(String msg, int start, int end, int admin) {
-    while (true) {
-      System.out.print(msg);
-      int val = 0;
-      try {
-        val = sc.nextInt();
-        if (val == admin) {
-          return val;
-        }
-        if (val < start || val > end) {
-          System.out.printf("[%d~%d 사이의 값 입력]%n", start, end);
-          continue;
-        }
-        return val;
-      } catch (Exception e) {
-        System.out.println("정수값을 입력해주세요");
-        sc.nextLine();
-      }
-    }//eow
-  }//eom
-
 }

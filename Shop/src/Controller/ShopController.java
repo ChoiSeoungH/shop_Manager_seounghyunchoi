@@ -20,54 +20,31 @@ public class ShopController {
 
   public void run() {
     init();
+    printMainMenu();
+  }//eow
+
+  private void printMainMenu() {
     while (true) {
-      printMainMenu();
-      int menu = InputManger.getValue("메뉴 입력 >> ", 0, 4, 100);
+      System.out.println("[1.로그인] [2.회원가입] [0.종료]");
+      int menu = InputManger.getValue("메뉴 입력 >> ", 0, 2);
       switch (menu) {
         case 0: //종료
-          FileManager.saveFile(idao, udao);
           System.out.println("종료");
           return;
-        case 1: //가입
-          if (isLogin()) {
-            System.out.println("로그아웃 후 이용");
-            continue;
+        case 1: //로그인
+          log = udao.login();
+          if (log==null) continue;
+          if (log.equals("admin")) {
+            printAdminMenu();
+          } else {
+            printMemberMenu();
           }
+          break;
+        case 2: //회원가입
           udao.joinUser();
           break;
-        case 2: //탈퇴
-          if (!isLogin()) {
-            System.out.println("로그인 후 이용");
-            continue;
-          }
-          udao.quitUser(log);
-          break;
-        case 3: //로그인
-          if (isLogin()) {
-            System.out.println("로그아웃 후 이용");
-            continue;
-          }
-          log = udao.login();
-          printMemberMenu();
-          break;
-        case 4: //로그아웃
-          if (!isLogin()) {
-            System.out.println("로그인 후 이용");
-            continue;
-          }
-          log = null;
-          System.out.println("로그아웃 완료");
-          break;
-        case 100: // 관리자
-          if (isLogin()) {
-            System.out.println("로그아웃 후 이용");
-            continue;
-          }
-          printAdminMenu();
-          break;
       }//eos
-
-    }//eow
+    }
   }
 
   private boolean isLogin() {
@@ -77,23 +54,20 @@ public class ShopController {
     return true;
   }
 
-  private void printMainMenu() {
-    System.out.println("[1.가입] [2.탈퇴] [3.로그인] [4.로그아웃]" + "\n[100.관리자] [0.종료] ");
-  }
-
   private void printAdminMenu() {
     while (true) {
-      System.out.println("[1.아이템관리] [2.카테고리관리] [3.장바구니관리] [4.유저관리] [0.뒤로가기] ");
-      int menu = InputManger.getValue("메뉴 입력 >> ", 0, 4);
+      System.out.println("[1.아이템관리] [2.카테고리관리] [3.장바구니관리] [4.유저관리] [5.파일 저장] [6.파일 로드] [0.로그아웃] ");
+      int menu = InputManger.getValue("메뉴 입력 >> ", 0, 6);
       switch (menu) {
         case 0:
-          System.out.println("뒤로가기");
+          log = null;
+          System.out.println("로그아웃");
           return;
         case 1: //아이템
-          printitemManagementMenu();
+          printItemManagementMenu();
           break;
         case 2: //카테고리
-          idao.categoryManagement(udao);
+          printCategoryManagementMenu();
           break;
         case 3: //장바구니
           printCartManagementMenu();
@@ -101,14 +75,38 @@ public class ShopController {
         case 4: //유저관리
           printUserManagementMenu();
           break;
+        case 5: //파일저장
+          FileManager.saveFile(idao,udao);
+          break;
+        case 6: //파일로드
+          FileManager.loadFile(idao,udao);
+          break;
       }
     }
+  }
+
+  private void printCategoryManagementMenu() {
+    while (true) {
+      idao.printCategory();
+      int menu = InputManger.getValue("[1.추가] [2.삭제] [0.뒤로가기] >> ", 0, 2);
+      switch (menu) {
+        case 0:
+          return;
+        case 1:
+          idao.addCategory();
+          break;
+        case 2:
+          idao.deleteCategory();
+          break;
+      }
+    }
+
   }
 
   private void printUserManagementMenu() {
     while (true) {
       udao.printUser();
-      int menu = InputManger.getValue("[1.추가] [2.삭제] [0.뒤로가기]", 0, 2);
+      int menu = InputManger.getValue("[1.추가] [2.삭제] [0.뒤로가기] >> ", 0, 2);
       switch (menu) {
         case 0:
           return;
@@ -126,7 +124,7 @@ public class ShopController {
   private void printCartManagementMenu() {
     while (true) {
       udao.printCart();
-      int menu = InputManger.getValue("[1.추가] [2.삭제] [0.뒤로가기]", 0, 2);
+      int menu = InputManger.getValue("[1.추가] [2.삭제] [0.뒤로가기] >> ", 0, 2);
       switch (menu) {
         case 0:
           return;
@@ -140,10 +138,10 @@ public class ShopController {
     }
   }
 
-  private void printitemManagementMenu() {
+  private void printItemManagementMenu() {
     while (true) {
-      idao.printItem();
-      int menu = InputManger.getValue("[1.추가] [2.삭제] [0.뒤로가기]", 0, 2);
+      idao.printCategory();
+      int menu = InputManger.getValue("[1.추가] [2.삭제] [0.뒤로가기] >> ", 0, 2);
       switch (menu) {
         case 0:
           return;
@@ -158,13 +156,14 @@ public class ShopController {
   }
 
   private void printMemberMenu() {
-    while (true) {
+    while (log!=null) {
       System.out.println(log + "님 로그인중");
-      System.out.println("[1.쇼핑] [2.장바구니목록] [0.뒤로가기]");
-      int menu = InputManger.getValue("메뉴 입력 >> ", 0, 4);
+      System.out.println("[1.쇼핑] [2.주문확인] [3.탈퇴(주문정보)] [0.로그아웃]");
+      int menu = InputManger.getValue("메뉴 입력 >> ", 0, 3);
       switch (menu) {
         case 0:
-          System.out.println("뒤로가기");
+          log = null;
+          System.out.println("로그아웃");
           return;
         case 1://쇼핑
           printCartMenu();
@@ -172,29 +171,28 @@ public class ShopController {
         case 2://장바구니
           udao.printMyCart(log, idao);
           break;
+        case 3://탈퇴
+          log = udao.quitUser(log);
+          break;
       }
     }
   }
 
   private void printCartMenu() {
     while (true) {
-      System.out.println("[1.내 장바구니] [2.삭제] [3.구입] [0.뒤로가기]");
-      int menu = InputManger.getValue("메뉴 입력 >> ", 0, 4);
+      System.out.println("[1.구입] [2.주문취소] [0.뒤로가기]");
+      int menu = InputManger.getValue("메뉴 입력 >> ", 0, 2);
       switch (menu) {
         case 0:
           System.out.println("뒤로가기");
           return;
-        case 1: //내장바구니
-          udao.printMyCart(log, idao);
+        case 1: //구입
+          idao.buyItem(log, udao);
           break;
         case 2: //최신 상품 삭제
-          udao.deleteMyCartItem(log);
-          break;
-        case 3: //구입
-          idao.buyItem(log, udao);
+          udao.deleteMyCartItem(log,idao);
           break;
       }
     }
   }
-
 }

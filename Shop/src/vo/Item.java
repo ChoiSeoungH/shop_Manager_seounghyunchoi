@@ -9,6 +9,10 @@ public class Item {
 
   }
 
+  public Item(String category) {
+    this.category = category;
+  }
+
   public Item(String name, int price, String category) {
     this.name = name;
     this.price = price;

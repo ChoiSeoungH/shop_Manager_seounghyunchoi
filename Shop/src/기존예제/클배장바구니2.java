@@ -56,7 +56,7 @@
 //					for (User u : userList) {
 //						if (u == null)
 //							break;
-//						if (id.equals(u.id)) {
+//						if (id.equals(U.id)) {
 //							check = true;
 //							logUser = u;
 //						}
