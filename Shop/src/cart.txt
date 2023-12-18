@@ -1,0 +1,6 @@
+aaa/사과
+ccc/칸초
+bbb/귤
+bbb/사과
+ccc/귤
+aaa/감
