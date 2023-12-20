@@ -32,6 +32,6 @@ public class Item {
   }
 
   public String toString() {
-    return name+" \t"+price+"원 \t"+category;
+    return name + " \t" + price + "원 \t" + category;
   }
 }

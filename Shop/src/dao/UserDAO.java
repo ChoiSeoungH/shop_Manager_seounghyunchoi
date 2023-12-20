@@ -74,7 +74,7 @@ public class UserDAO {
   }
 
   public String quitUser(String log) {
-    System.out.println(log+"님 회원탈퇴");
+    System.out.println(log + "님 회원탈퇴");
     int delIdx = isExistId(log);
     String pw = InputManger.getValue("pw >> ");
     if (!userList.get(delIdx).getPw().equals(pw)) {

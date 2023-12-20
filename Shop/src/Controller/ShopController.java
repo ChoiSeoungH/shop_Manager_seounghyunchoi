@@ -4,7 +4,6 @@ import Utils.FileManager;
 import Utils.InputManger;
 import dao.ItemDAO;
 import dao.UserDAO;
-import vo.Cart;
 
 public class ShopController {
 
@@ -33,7 +32,7 @@ public class ShopController {
           return;
         case 1: //로그인
           log = udao.login();
-          if (log==null) continue;
+          if (log == null) continue;
           if (log.equals("admin")) {
             printAdminMenu();
           } else {
@@ -48,10 +47,7 @@ public class ShopController {
   }
 
   private boolean isLogin() {
-    if (log == null) {
-      return false;
-    }
-    return true;
+    return log != null;
   }
 
   private void printAdminMenu() {
@@ -76,10 +72,10 @@ public class ShopController {
           printUserManagementMenu();
           break;
         case 5: //파일저장
-          FileManager.saveFile(idao,udao);
+          FileManager.saveFile(idao, udao);
           break;
         case 6: //파일로드
-          FileManager.loadFile(idao,udao);
+          FileManager.loadFile(idao, udao);
           break;
       }
     }
@@ -156,7 +152,7 @@ public class ShopController {
   }
 
   private void printMemberMenu() {
-    while (log!=null) {
+    while (log != null) {
       System.out.println(log + "님 로그인중");
       System.out.println("[1.쇼핑] [2.주문확인] [3.탈퇴(주문정보)] [0.로그아웃]");
       int menu = InputManger.getValue("메뉴 입력 >> ", 0, 3);
@@ -190,7 +186,7 @@ public class ShopController {
           idao.buyItem(log, udao);
           break;
         case 2: //최신 상품 삭제
-          udao.deleteMyCartItem(log,idao);
+          udao.deleteMyCartItem(log, idao);
           break;
       }
     }

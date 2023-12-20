@@ -21,6 +21,6 @@ public class Cart {
   }
 
   public String toString() {
-    return userId+" \t"+itemName;
+    return userId + " \t" + itemName;
   }
 }
